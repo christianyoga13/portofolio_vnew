@@ -1,6 +1,8 @@
+import ThemeToggle from './ThemeToggle';
+
 export default function Header() {
   return (
-    <header className="relative flex items-center px-6 md:px-16 py-6 md:py-8" style={{ fontFamily: "var(--font-space-grotesk)" }}>
+    <header className="relative flex items-center px-6 md:px-16 py-6 md:py-8 text-black dark:text-white" style={{ fontFamily: "var(--font-space-grotesk)" }}>
       {/* Left - Email */}
       <div className="text-xs md:text-sm tracking-wider uppercase flex-shrink-0">
         YOGASHANDY50@GMAIL.COM
@@ -30,12 +32,7 @@ export default function Header() {
       </div>
 
       {/* Right - Theme Toggle */}
-      <button className="w-8 h-8 md:w-10 md:h-10 rounded-full border-2 border-white flex items-center justify-center overflow-hidden flex-shrink-0 ml-auto">
-        <div className="w-full h-full flex">
-          <div className="w-1/2 bg-white"></div>
-          <div className="w-1/2 bg-[#0a0a0a]"></div>
-        </div>
-      </button>
+      <ThemeToggle />
     </header>
   );
 }

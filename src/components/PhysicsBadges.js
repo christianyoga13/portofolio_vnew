@@ -207,11 +207,11 @@ export default function PhysicsBadges({ groundY, ceilingY = 0 }) {
       return (
         <div key={badge.id} style={style}>
           <div
-            className="rounded-full bg-white flex items-center justify-center"
+            className="rounded-full bg-black dark:bg-white flex items-center justify-center transition-colors duration-300"
             style={{ width: size.w, height: size.h }}
           >
             {badge.id === "asterisk" ? (
-              <span className="text-black text-3xl md:text-4xl font-bold">
+              <span className="text-white dark:text-black text-3xl md:text-4xl font-bold">
                 ✻
               </span>
             ) : (
@@ -220,7 +220,7 @@ export default function PhysicsBadges({ groundY, ceilingY = 0 }) {
                 height="34"
                 viewBox="0 0 24 24"
                 fill="none"
-                stroke="black"
+                className="stroke-white dark:stroke-black"
                 strokeWidth="2.5"
               >
                 <path d="M12 5V19M12 19L5 12M12 19L19 12" />
@@ -236,7 +236,7 @@ export default function PhysicsBadges({ groundY, ceilingY = 0 }) {
     return (
       <div key={badge.id} style={style}>
         <div
-          className={`border border-white/60 rounded-full tracking-wider uppercase bg-[#0a0a0a] flex items-center justify-center whitespace-nowrap ${
+          className={`border border-black/30 dark:border-white/60 rounded-full tracking-wider uppercase bg-white dark:bg-[#0a0a0a] text-black dark:text-white flex items-center justify-center whitespace-nowrap transition-colors duration-300 ${
             isPillSm
               ? "px-8 py-4 text-base md:text-lg"
               : "px-10 py-5 text-base md:text-lg"

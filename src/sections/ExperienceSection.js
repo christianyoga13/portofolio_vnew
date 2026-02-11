@@ -33,7 +33,7 @@ export default function ExperienceSection() {
             ref={titleRef}
             className={`lg:w-72 flex-shrink-0 animate-fade-in ${titleVisible ? 'is-visible' : ''}`}
           >
-            <h2 className="text-3xl md:text-4xl lg:text-5xl font-light tracking-tight">
+            <h2 className="text-3xl md:text-4xl lg:text-5xl font-light tracking-tight text-black dark:text-white">
               Experiences
             </h2>
           </div>
@@ -49,16 +49,16 @@ export default function ExperienceSection() {
                 className={`space-y-4 animate-fade-in ${gridVisible ? 'is-visible' : ''} animate-fade-in-delay-${(index % 3) + 1}`}
               >
                 {/* Year/Period */}
-                <div className="text-sm md:text-base text-white/40 font-light">
+                <div className="text-sm md:text-base text-black/40 dark:text-white/40 font-light">
                   {exp.year}
                 </div>
                 
                 {/* Role & Company */}
                 <div className="space-y-2">
-                  <h3 className="text-lg md:text-xl font-normal text-white leading-tight">
+                  <h3 className="text-lg md:text-xl font-normal text-black dark:text-white leading-tight">
                     {exp.role}
                   </h3>
-                  <p className="text-sm md:text-base text-white/40 font-light">
+                  <p className="text-sm md:text-base text-black/40 dark:text-white/40 font-light">
                     {exp.company}
                   </p>
                 </div>

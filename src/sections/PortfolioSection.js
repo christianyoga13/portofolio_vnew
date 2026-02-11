@@ -133,10 +133,10 @@ export default function PortfolioSection() {
           ref={headerRef}
           className={`mb-16 md:mb-24 animate-fade-in ${headerVisible ? 'is-visible' : ''}`}
         >
-          <h2 className="text-4xl md:text-5xl lg:text-6xl font-normal leading-tight mb-4">
+          <h2 className="text-4xl md:text-5xl lg:text-6xl font-normal leading-tight mb-4 text-black dark:text-white">
             Selected Works
           </h2>
-          <p className="text-lg md:text-xl text-white/60">
+          <p className="text-lg md:text-xl text-black/60 dark:text-white/60">
             A collection of projects I&apos;ve worked on
           </p>
         </div>
@@ -169,7 +169,7 @@ export default function PortfolioSection() {
               {/* Project Card */}
               <div className="space-y-4">
                 {/* Project Image */}
-                <div className="relative w-full h-80 md:h-96 overflow-hidden rounded-2xl bg-white/5 border border-white/5 hover:border-white/10 transition-colors duration-300">
+                <div className="relative w-full h-80 md:h-96 overflow-hidden rounded-2xl bg-black/5 dark:bg-white/5 border border-black/5 dark:border-white/5 hover:border-black/10 dark:hover:border-white/10 transition-colors duration-300">
                   <Image
                     src={project.image}
                     alt={project.title}
@@ -208,13 +208,13 @@ export default function PortfolioSection() {
                   <div className="flex-1">
                     {/* Category Badge */}
                     <div className="mb-2">
-                      <span className="inline-block text-xs px-3 py-1 bg-white/5 text-white/60 rounded-full border border-white/10">
+                      <span className="inline-block text-xs px-3 py-1 bg-black/5 dark:bg-white/5 text-black/60 dark:text-white/60 rounded-full border border-black/10 dark:border-white/10">
                         {project.category}
                       </span>
                     </div>
                     
                     {/* Title with Status */}
-                    <h3 className="text-2xl md:text-3xl font-normal mb-1 group-hover:text-white/80 transition-colors flex items-center gap-2 flex-wrap">
+                    <h3 className="text-2xl md:text-3xl font-normal mb-1 text-black dark:text-white group-hover:text-black/80 dark:group-hover:text-white/80 transition-colors flex items-center gap-2 flex-wrap">
                       {project.title}
                       {project.status === 'coming-soon' && (
                         <span className="text-xs px-2 py-1 bg-yellow-500/20 text-yellow-400 rounded-full border border-yellow-500/30">
@@ -224,13 +224,13 @@ export default function PortfolioSection() {
                     </h3>
                     
                     {/* Description */}
-                    <p className="text-base text-white/50">
+                    <p className="text-base text-black/50 dark:text-white/50">
                       {project.description}
                     </p>
                   </div>
                   
                   {/* Year */}
-                  <div className="text-2xl md:text-3xl text-white/40 group-hover:text-white/60 transition-colors ml-4">
+                  <div className="text-2xl md:text-3xl text-black/40 dark:text-white/40 group-hover:text-black/60 dark:group-hover:text-white/60 transition-colors ml-4">
                     {project.year}
                   </div>
                 </div>
@@ -245,12 +245,12 @@ export default function PortfolioSection() {
           <div className="flex justify-center mt-12 md:mt-16">
             <button
               onClick={handleToggleProjects}
-              className="group relative px-8 py-4 bg-white/5 hover:bg-white/10 border border-white/10 hover:border-white/20 rounded-full transition-all duration-300 overflow-hidden"
+              className="group relative px-8 py-4 bg-black/5 dark:bg-white/5 hover:bg-black/10 dark:hover:bg-white/10 border border-black/10 dark:border-white/10 hover:border-black/20 dark:hover:border-white/20 rounded-full transition-all duration-300 overflow-hidden"
             >
               {/* Background animation */}
               <div className="absolute inset-0 bg-gradient-to-r from-blue-500/0 via-purple-500/0 to-pink-500/0 group-hover:from-blue-500/10 group-hover:via-purple-500/10 group-hover:to-pink-500/10 transition-all duration-500" />
               
-              <span className="relative flex items-center gap-2 text-lg font-light">
+              <span className="relative flex items-center gap-2 text-lg font-light text-black dark:text-white">
                 {showAll ? (
                   <>
                     Show Less

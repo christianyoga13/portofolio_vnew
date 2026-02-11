@@ -67,10 +67,10 @@ export default function ContactSection() {
           ref={headerRef}
           className={`mb-16 md:mb-24 animate-fade-in ${headerVisible ? 'is-visible' : ''}`}
         >
-          <h2 className="text-5xl md:text-6xl lg:text-7xl font-normal leading-tight mb-6">
+          <h2 className="text-5xl md:text-6xl lg:text-7xl font-normal leading-tight mb-6 text-black dark:text-white">
             LET&apos;S GET IN TOUCH
           </h2>
-          <p className="text-lg md:text-xl text-white/60 max-w-2xl">
+          <p className="text-lg md:text-xl text-black/60 dark:text-white/60 max-w-2xl">
             Have a project in mind or just want to chat? I&apos;d love to hear from you.
           </p>
         </div>
@@ -84,19 +84,19 @@ export default function ContactSection() {
           <div className="space-y-12">
             {/* Email */}
             <div className="space-y-4">
-              <h3 className="text-sm uppercase tracking-wider text-white/50">Email</h3>
+              <h3 className="text-sm uppercase tracking-wider text-black/50 dark:text-white/50">Email</h3>
               <a 
                 href="mailto:your.email@example.com" 
-                className="text-2xl md:text-3xl font-light hover:text-white/80 transition-colors duration-300 block group"
+                className="text-2xl md:text-3xl font-light text-black dark:text-white hover:text-black/80 dark:hover:text-white/80 transition-colors duration-300 block group"
               >
                 your.email@example.com
-                <span className="block h-px w-0 bg-white/80 transition-all duration-500 group-hover:w-full mt-2"></span>
+                <span className="block h-px w-0 bg-black/80 dark:bg-white/80 transition-all duration-500 group-hover:w-full mt-2"></span>
               </a>
             </div>
 
             {/* Social Media Links */}
             <div className="space-y-4">
-              <h3 className="text-sm uppercase tracking-wider text-white/50">Connect</h3>
+              <h3 className="text-sm uppercase tracking-wider text-black/50 dark:text-white/50">Connect</h3>
               <div className="flex flex-wrap gap-3">
                 {socialLinks.map((social) => (
                   <a
@@ -104,12 +104,12 @@ export default function ContactSection() {
                     href={social.url}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="group relative px-5 py-3 bg-white/5 hover:bg-white/10 border border-white/10 hover:border-white/20 rounded-full transition-all duration-300 overflow-hidden"
+                    className="group relative px-5 py-3 bg-black/5 dark:bg-white/5 hover:bg-black/10 dark:hover:bg-white/10 border border-black/10 dark:border-white/10 hover:border-black/20 dark:hover:border-white/20 rounded-full transition-all duration-300 overflow-hidden"
                   >
                     {/* Background animation */}
                     <div className="absolute inset-0 bg-gradient-to-r from-blue-500/0 via-purple-500/0 to-pink-500/0 group-hover:from-blue-500/10 group-hover:via-purple-500/10 group-hover:to-pink-500/10 transition-all duration-500" />
                     
-                    <span className="relative flex items-center gap-2 font-light">
+                    <span className="relative flex items-center gap-2 font-light text-black dark:text-white">
                       {social.icon}
                       {social.name}
                     </span>
@@ -120,8 +120,8 @@ export default function ContactSection() {
 
             {/* Location (Optional) */}
             <div className="space-y-4">
-              <h3 className="text-sm uppercase tracking-wider text-white/50">Location</h3>
-              <p className="text-xl text-white/70">
+              <h3 className="text-sm uppercase tracking-wider text-black/50 dark:text-white/50">Location</h3>
+              <p className="text-xl text-black/70 dark:text-white/70">
                 Jakarta, Indonesia
               </p>
             </div>
@@ -132,7 +132,7 @@ export default function ContactSection() {
             <form onSubmit={handleSubmit} className="space-y-6">
               {/* Name Input */}
               <div className="group">
-                <label htmlFor="name" className="block text-sm text-white/50 mb-2 group-focus-within:text-white/80 transition-colors">
+                <label htmlFor="name" className="block text-sm text-black/50 dark:text-white/50 mb-2 group-focus-within:text-black/80 dark:group-focus-within:text-white/80 transition-colors">
                   Name
                 </label>
                 <input
@@ -142,14 +142,14 @@ export default function ContactSection() {
                   value={formData.name}
                   onChange={handleChange}
                   required
-                  className="w-full px-6 py-4 bg-white/5 border border-white/10 rounded-2xl text-white placeholder-white/30 focus:bg-white/10 focus:border-white/30 focus:outline-none transition-all duration-300"
+                  className="w-full px-6 py-4 bg-black/5 dark:bg-white/5 border border-black/10 dark:border-white/10 rounded-2xl text-black dark:text-white placeholder-black/30 dark:placeholder-white/30 focus:bg-black/10 dark:focus:bg-white/10 focus:border-black/30 dark:focus:border-white/30 focus:outline-none transition-all duration-300"
                   placeholder="Your name"
                 />
               </div>
 
               {/* Email Input */}
               <div className="group">
-                <label htmlFor="email" className="block text-sm text-white/50 mb-2 group-focus-within:text-white/80 transition-colors">
+                <label htmlFor="email" className="block text-sm text-gray-500 dark:text-gray-400 mb-2 group-focus-within:text-gray-700 dark:group-focus-within:text-gray-300 transition-colors">
                   Email
                 </label>
                 <input
@@ -159,14 +159,14 @@ export default function ContactSection() {
                   value={formData.email}
                   onChange={handleChange}
                   required
-                  className="w-full px-6 py-4 bg-white/5 border border-white/10 rounded-2xl text-white placeholder-white/30 focus:bg-white/10 focus:border-white/30 focus:outline-none transition-all duration-300"
+                  className="w-full px-6 py-4 bg-gray-100 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-2xl text-gray-900 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-500 focus:bg-gray-50 dark:focus:bg-gray-900 focus:border-gray-300 dark:focus:border-gray-600 focus:outline-none transition-all duration-300"
                   placeholder="your.email@example.com"
                 />
               </div>
 
               {/* Message Input */}
               <div className="group">
-                <label htmlFor="message" className="block text-sm text-white/50 mb-2 group-focus-within:text-white/80 transition-colors">
+                <label htmlFor="message" className="block text-sm text-black/50 dark:text-white/50 mb-2 group-focus-within:text-black/80 dark:group-focus-within:text-white/80 transition-colors">
                   Message
                 </label>
                 <textarea
@@ -176,7 +176,7 @@ export default function ContactSection() {
                   onChange={handleChange}
                   required
                   rows={6}
-                  className="w-full px-6 py-4 bg-white/5 border border-white/10 rounded-2xl text-white placeholder-white/30 focus:bg-white/10 focus:border-white/30 focus:outline-none transition-all duration-300 resize-none"
+                  className="w-full px-6 py-4 bg-black/5 dark:bg-white/5 border border-black/10 dark:border-white/10 rounded-2xl text-black dark:text-white placeholder-black/30 dark:placeholder-white/30 focus:bg-black/10 dark:focus:bg-white/10 focus:border-black/30 dark:focus:border-white/30 focus:outline-none transition-all duration-300 resize-none"
                   placeholder="Tell me about your project..."
                 />
               </div>
@@ -184,7 +184,7 @@ export default function ContactSection() {
               {/* Submit Button */}
               <button
                 type="submit"
-                className="group relative w-full px-8 py-4 bg-white text-black hover:bg-white/90 rounded-full transition-all duration-300 overflow-hidden font-medium"
+                className="group relative w-full px-8 py-4 bg-black dark:bg-white text-white dark:text-black hover:bg-black/90 dark:hover:bg-white/90 rounded-full transition-all duration-300 overflow-hidden font-medium"
               >
                 <span className="relative flex items-center justify-center gap-2">
                   Send Message
@@ -203,7 +203,7 @@ export default function ContactSection() {
         </div>
 
         {/* Footer */}
-        <div className="mt-24 pt-8 border-t border-white/10 flex flex-col md:flex-row justify-between items-center gap-4 text-white/40 text-sm">
+        <div className="mt-24 pt-8 border-t border-black/10 dark:border-white/10 flex flex-col md:flex-row justify-between items-center gap-4 text-black/40 dark:text-white/40 text-sm">
           <p>© 2026 All Rights Reserved</p>
           <p>Designed & Built with 💜</p>
         </div>

@@ -48,14 +48,14 @@ export default function AboutSection() {
         >
           {/* Left - Headline */}
           <div className={`animate-fade-in ${textVisible ? 'is-visible' : ''}`}>
-            <h2 className="text-4xl md:text-5xl lg:text-6xl font-normal leading-tight">
+            <h2 className="text-4xl md:text-5xl lg:text-6xl font-normal leading-tight text-black dark:text-white">
               Hi, I&apos;m Yoga, a software engineer that loves to build solutions
             </h2>
           </div>
 
           {/* Right - Description */}
           <div className={`flex items-center animate-fade-in ${textVisible ? 'is-visible' : ''} animate-fade-in-delay-1`}>
-            <p className="text-base md:text-lg leading-relaxed text-white/80">
+            <p className="text-base md:text-lg leading-relaxed text-black/70 dark:text-white/80">
               Software engineer, specializing in crafting user-friendly web applications
               and systems with expertise in Frontend Development, Backend Development,
               WordPress Development, JavaScript, and modern web technologies.
