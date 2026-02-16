@@ -39,7 +39,7 @@ export default function HeroSection() {
       <div className="absolute inset-0 flex items-center justify-center pointer-events-none z-10">
         <h1
           ref={nameRef}
-          className="text-5xl md:text-7xl lg:text-8xl xl:text-9xl font-bold text-center leading-[0.9] uppercase px-4 text-black dark:text-white animate-fade-in is-visible"
+          className="text-4xl sm:text-5xl md:text-7xl lg:text-8xl xl:text-9xl font-bold text-center leading-[0.9] uppercase px-4 text-black dark:text-white animate-fade-in is-visible"
         >
           CHRISTIAN YOGA SHANDY KURNIADI
         </h1>

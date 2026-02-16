@@ -20,19 +20,34 @@ export default function PhysicsBadges({ groundY, ceilingY = 0 }) {
   const bodiesRef = useRef({});
   const [positions, setPositions] = useState({});
   const rafRef = useRef(null);
+  const [isMobile, setIsMobile] = useState(false);
+
+  // Track mobile state changes to trigger re-mount when crossing breakpoint
+  useEffect(() => {
+    const checkMobile = () => {
+      const mobile = window.innerWidth < 768;
+      setIsMobile(mobile);
+    };
+    checkMobile();
+    window.addEventListener("resize", checkMobile);
+    return () => window.removeEventListener("resize", checkMobile);
+  }, []);
 
   const getBodySize = useCallback((badge) => {
+    // Responsive sizing based on viewport width
+    const scale = isMobile ? 0.55 : 1; // Scale down to 55% on mobile
+    
     switch (badge.type) {
       case "pill":
-        return { w: 280, h: 56 };
+        return { w: 280 * scale, h: 56 * scale };
       case "pill-sm":
-        return { w: 160, h: 50 };
+        return { w: 160 * scale, h: 50 * scale };
       case "circle":
-        return { w: 72, h: 72 };
+        return { w: 72 * scale, h: 72 * scale };
       default:
-        return { w: 200, h: 50 };
+        return { w: 200 * scale, h: 50 * scale };
     }
-  }, []);
+  }, [isMobile]);
 
   useEffect(() => {
     if (!containerRef.current) return;
@@ -42,18 +57,33 @@ export default function PhysicsBadges({ groundY, ceilingY = 0 }) {
     const height = container.offsetHeight;
     const floor = groundY || height * 0.42;
     const ceiling = ceilingY || 0;
+    const floorMargin = 15; // Extra margin to prevent escaping
 
     const engine = Matter.Engine.create({
       gravity: { x: 0, y: 0.6 },
     });
     engineRef.current = engine;
 
-    const wallThickness = 60;
+    const wallThickness = 150;
     const walls = [
-      Matter.Bodies.rectangle(width / 2, floor + wallThickness / 2, width * 2, wallThickness, { isStatic: true }),
-      Matter.Bodies.rectangle(-wallThickness / 2, height / 2, wallThickness, height * 3, { isStatic: true }),
-      Matter.Bodies.rectangle(width + wallThickness / 2, height / 2, wallThickness, height * 3, { isStatic: true }),
-      Matter.Bodies.rectangle(width / 2, ceiling - wallThickness / 2, width * 2, wallThickness, { isStatic: true }),
+      Matter.Bodies.rectangle(width / 2, floor + wallThickness / 2, width * 2, wallThickness, { 
+        isStatic: true, 
+        slop: 0,
+        friction: 1,
+        restitution: 0
+      }),
+      Matter.Bodies.rectangle(-wallThickness / 2, height / 2, wallThickness, height * 3, { 
+        isStatic: true,
+        slop: 0 
+      }),
+      Matter.Bodies.rectangle(width + wallThickness / 2, height / 2, wallThickness, height * 3, { 
+        isStatic: true,
+        slop: 0 
+      }),
+      Matter.Bodies.rectangle(width / 2, ceiling - wallThickness / 2, width * 2, wallThickness, { 
+        isStatic: true,
+        slop: 0 
+      }),
     ];
     Matter.Composite.add(engine.world, walls);
 
@@ -83,6 +113,7 @@ export default function PhysicsBadges({ groundY, ceilingY = 0 }) {
         frictionAir: 0.015,
         angle: (badge.rotate * Math.PI) / 180,
         density: 0.002,
+        slop: 0,
       });
 
       bodiesRef.current[badge.id] = body;
@@ -126,8 +157,8 @@ export default function PhysicsBadges({ groundY, ceilingY = 0 }) {
             x: pos.x - body.position.x,
             y: pos.y - body.position.y,
           },
-          stiffness: 0.8,
-          damping: 0.1,
+          stiffness: 0.5,
+          damping: 0.2,
           length: 0,
         });
         Matter.Composite.add(engine.world, dragConstraint);
@@ -159,6 +190,87 @@ export default function PhysicsBadges({ groundY, ceilingY = 0 }) {
     const runner = Matter.Runner.create();
     Matter.Runner.run(runner, engine);
 
+    // Constrain bodies to stay within boundaries - BEFORE physics update
+    Matter.Events.on(engine, 'beforeUpdate', () => {
+      BADGES.forEach((badge) => {
+        const body = bodiesRef.current[badge.id];
+        if (body) {
+          const size = getBodySize(badge);
+          const halfH = size.h / 2;
+          const halfW = size.w / 2;
+          
+          // Constrain to boundaries with margin
+          if (body.position.y + halfH > floor - floorMargin) {
+            Matter.Body.setPosition(body, { 
+              x: body.position.x, 
+              y: floor - floorMargin - halfH 
+            });
+            Matter.Body.setVelocity(body, { x: body.velocity.x * 0.5, y: 0 });
+          }
+          if (body.position.y - halfH < ceiling) {
+            Matter.Body.setPosition(body, { 
+              x: body.position.x, 
+              y: ceiling + halfH 
+            });
+            Matter.Body.setVelocity(body, { x: body.velocity.x * 0.5, y: 0 });
+          }
+          if (body.position.x - halfW < 0) {
+            Matter.Body.setPosition(body, { 
+              x: halfW, 
+              y: body.position.y 
+            });
+            Matter.Body.setVelocity(body, { x: 0, y: body.velocity.y * 0.5 });
+          }
+          if (body.position.x + halfW > width) {
+            Matter.Body.setPosition(body, { 
+              x: width - halfW, 
+              y: body.position.y 
+            });
+            Matter.Body.setVelocity(body, { x: 0, y: body.velocity.y * 0.5 });
+          }
+        }
+      });
+    });
+
+    // Additional constraint AFTER physics update to prevent any escape
+    Matter.Events.on(engine, 'afterUpdate', () => {
+      BADGES.forEach((badge) => {
+        const body = bodiesRef.current[badge.id];
+        if (body) {
+          const size = getBodySize(badge);
+          const halfH = size.h / 2;
+          const halfW = size.w / 2;
+          
+          // Force constrain - no exceptions
+          let needsCorrection = false;
+          let newX = body.position.x;
+          let newY = body.position.y;
+
+          if (body.position.y + halfH > floor - floorMargin) {
+            newY = floor - floorMargin - halfH;
+            needsCorrection = true;
+          }
+          if (body.position.y - halfH < ceiling) {
+            newY = ceiling + halfH;
+            needsCorrection = true;
+          }
+          if (body.position.x - halfW < 0) {
+            newX = halfW;
+            needsCorrection = true;
+          }
+          if (body.position.x + halfW > width) {
+            newX = width - halfW;
+            needsCorrection = true;
+          }
+
+          if (needsCorrection) {
+            Matter.Body.setPosition(body, { x: newX, y: newY });
+            Matter.Body.setVelocity(body, { x: 0, y: 0 });
+          }
+        }
+      });
+    });
+
     // Sync physics positions → React state
     const updatePositions = () => {
       const next = {};
@@ -186,7 +298,7 @@ export default function PhysicsBadges({ groundY, ceilingY = 0 }) {
       Matter.Engine.clear(engine);
       cancelAnimationFrame(rafRef.current);
     };
-  }, [getBodySize, groundY, ceilingY]);
+  }, [getBodySize, groundY, ceilingY, isMobile]);
 
   const renderBadge = (badge) => {
     const pos = positions[badge.id];
@@ -211,13 +323,13 @@ export default function PhysicsBadges({ groundY, ceilingY = 0 }) {
             style={{ width: size.w, height: size.h }}
           >
             {badge.id === "asterisk" ? (
-              <span className="text-white dark:text-black text-3xl md:text-4xl font-bold">
+              <span className="text-white dark:text-black text-xl md:text-3xl lg:text-4xl font-bold">
                 ✻
               </span>
             ) : (
               <svg
-                width="34"
-                height="34"
+                width={size.w * 0.47}
+                height={size.h * 0.47}
                 viewBox="0 0 24 24"
                 fill="none"
                 className="stroke-white dark:stroke-black"
@@ -238,8 +350,8 @@ export default function PhysicsBadges({ groundY, ceilingY = 0 }) {
         <div
           className={`border border-black/30 dark:border-white/60 rounded-full tracking-wider uppercase bg-white dark:bg-[#0a0a0a] text-black dark:text-white flex items-center justify-center whitespace-nowrap transition-colors duration-300 ${
             isPillSm
-              ? "px-8 py-4 text-base md:text-lg"
-              : "px-10 py-5 text-base md:text-lg"
+              ? "px-4 py-2 text-xs md:px-8 md:py-4 md:text-base lg:text-lg"
+              : "px-5 py-2.5 text-xs md:px-10 md:py-5 md:text-base lg:text-lg"
           }`}
         >
           {badge.label}
