@@ -47,21 +47,15 @@ body {
   overflow-x: hidden;
 }
 
-/* Smooth scrolling fallback */
 html {
-  scroll-behavior: smooth;
   overflow-x: hidden;
+  -webkit-text-size-adjust: 100%;
 }
 
 /* Optimize rendering for smooth animations */
 * {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-}
-
-/* Improve scrolling performance */
-body {
-  overscroll-behavior-y: none;
 }
 
 /* Scroll Animations */
@@ -91,11 +85,6 @@ body {
 
 .animate-fade-in-delay-4 {
   transition-delay: 0.4s;
-}
-
-/* Smooth scrolling */
-html {
-  scroll-behavior: smooth;
 }
 
 /* Project expand animation */

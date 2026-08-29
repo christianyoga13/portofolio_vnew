@@ -9,18 +9,19 @@ export default function SmoothScroll({ children }) {
   useEffect(() => {
     // Initialize Lenis
     const lenis = new Lenis({
-      duration: 1.2, // Duration of scroll animation
-      easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)), // Easing function
-      orientation: 'vertical', // Vertical scrolling
+      duration: 1.1,
+      easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
+      orientation: 'vertical',
       gestureOrientation: 'vertical',
       smoothWheel: true,
       wheelMultiplier: 1,
-      smoothTouch: false, // Disable on touch devices for better mobile performance
-      touchMultiplier: 2,
+      touchMultiplier: 1,
+      syncTouch: false,
       infinite: false,
     });
 
     lenisRef.current = lenis;
+    window.lenis = lenis;
 
     // Add lenis class to html element
     document.documentElement.classList.add('lenis', 'lenis-smooth');
@@ -36,6 +37,7 @@ export default function SmoothScroll({ children }) {
     // Cleanup
     return () => {
       lenis.destroy();
+      window.lenis = null;
       document.documentElement.classList.remove('lenis', 'lenis-smooth');
     };
   }, []);

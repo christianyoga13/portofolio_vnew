@@ -22,20 +22,17 @@ export default function HeroSection() {
   }, []);
 
   return (
-    <div 
-      ref={heroRef} 
-      className="relative" 
-      style={{ 
+    <div
+      ref={heroRef}
+      className="relative"
+      style={{
         height: "calc(100vh - 80px)",
         fontFamily: "var(--font-space-grotesk)"
       }}
     >
-      {/* Physics Badges */}
       {badgeBounds && (
         <PhysicsBadges groundY={badgeBounds.groundY} ceilingY={badgeBounds.ceilingY} />
       )}
-
-      {/* Name - Centered */}
       <div className="absolute inset-0 flex items-center justify-center pointer-events-none z-10">
         <h1
           ref={nameRef}
