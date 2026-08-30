@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import emailjs from '@emailjs/browser';
 import { useScrollAnimation } from '@/hooks/useScrollAnimation';
 
 export default function ContactSection() {
@@ -11,11 +12,76 @@ export default function ContactSection() {
     email: '',
     message: ''
   });
+  const [status, setStatus] = useState('idle'); // 'idle' | 'loading' | 'success' | 'error'
+  const [statusMessage, setStatusMessage] = useState('');
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    // Handle form submission
-    console.log('Form submitted:', formData);
+
+    const serviceId = process.env.NEXT_PUBLIC_EMAILJS_SERVICE_ID;
+    const templateId = process.env.NEXT_PUBLIC_EMAILJS_TEMPLATE_ID;
+    const publicKey = process.env.NEXT_PUBLIC_EMAILJS_PUBLIC_KEY;
+
+    if (!serviceId || !templateId || !publicKey) {
+      console.error(
+        'EmailJS Error: Missing environment variables. Please set NEXT_PUBLIC_EMAILJS_SERVICE_ID, NEXT_PUBLIC_EMAILJS_TEMPLATE_ID, and NEXT_PUBLIC_EMAILJS_PUBLIC_KEY in your .env.local file.'
+      );
+      setStatus('error');
+      setStatusMessage(
+        'Email service is not yet configured. Please add your EmailJS keys to .env.local.'
+      );
+      return;
+    }
+
+    setStatus('loading');
+    setStatusMessage('');
+
+    try {
+      const templateParams = {
+        name: formData.name.trim(),
+        from_name: formData.name.trim(),
+        email: formData.email.trim(),
+        from_email: formData.email.trim(),
+        message: formData.message.trim(),
+        reply_to: formData.email.trim(),
+        to_name: 'Christian Yoga'
+      };
+
+      await emailjs.send(serviceId, templateId, templateParams, publicKey);
+
+      setStatus('success');
+      setStatusMessage('Thank you! Your message has been sent successfully. I will get back to you soon.');
+      setFormData({
+        name: '',
+        email: '',
+        message: ''
+      });
+    } catch (error) {
+      console.error('EmailJS Send Error Details:', {
+        status: error?.status,
+        text: error?.text,
+        message: error?.message,
+        error
+      });
+
+      const rawErrorText = error?.text || error?.message || (typeof error === 'string' ? error : '');
+      let userFriendlyMessage = 'Failed to send message. Please try again or reach out directly via email.';
+
+      if (rawErrorText.includes('Invalid grant') || rawErrorText.includes('reconnect')) {
+        userFriendlyMessage = 'Gmail connection in EmailJS expired. Please reconnect your Gmail account in the EmailJS dashboard (Email Services > Reconnect Account).';
+      } else if (rawErrorText.includes('service') && rawErrorText.includes('not found')) {
+        userFriendlyMessage = 'Invalid EmailJS Service ID. Please check your NEXT_PUBLIC_EMAILJS_SERVICE_ID in .env.local.';
+      } else if (rawErrorText.includes('template') && rawErrorText.includes('not found')) {
+        userFriendlyMessage = 'Invalid EmailJS Template ID. Please check your NEXT_PUBLIC_EMAILJS_TEMPLATE_ID in .env.local.';
+      } else if (rawErrorText.includes('public key') || rawErrorText.includes('user') && rawErrorText.includes('not found')) {
+        userFriendlyMessage = 'Invalid EmailJS Public Key. Please check your NEXT_PUBLIC_EMAILJS_PUBLIC_KEY in .env.local.';
+      } else if (rawErrorText) {
+        userFriendlyMessage = rawErrorText;
+      }
+
+      setStatus('error');
+      setStatusMessage(userFriendlyMessage);
+    }
   };
 
   const handleChange = (e) => {
@@ -23,6 +89,11 @@ export default function ContactSection() {
       ...formData,
       [e.target.name]: e.target.value
     });
+    // Clear error status if user starts typing again
+    if (status === 'error') {
+      setStatus('idle');
+      setStatusMessage('');
+    }
   };
 
   const socialLinks = [
@@ -57,8 +128,8 @@ export default function ContactSection() {
 
   return (
     <section className="min-h-screen w-full px-5 sm:px-8 md:px-16 py-14 sm:py-20 md:py-28 relative overflow-hidden">
-      <div className="absolute top-0 right-0 w-96 h-96 bg-purple-500/5 rounded-full blur-3xl" />
-      <div className="absolute bottom-0 left-0 w-96 h-96 bg-blue-500/5 rounded-full blur-3xl" />
+      <div className="absolute top-0 right-0 w-96 h-96 bg-purple-500/5 rounded-full blur-3xl pointer-events-none" />
+      <div className="absolute bottom-0 left-0 w-96 h-96 bg-blue-500/5 rounded-full blur-3xl pointer-events-none" />
 
       <div className="w-full max-w-6xl mx-auto relative z-10">
         <div
@@ -72,6 +143,7 @@ export default function ContactSection() {
             Have a project in mind or just want to chat? I&apos;d love to hear from you.
           </p>
         </div>
+
         <div
           ref={contentRef}
           className={`grid md:grid-cols-2 gap-10 md:gap-16 animate-fade-in ${contentVisible ? 'is-visible' : ''}`}
@@ -87,6 +159,7 @@ export default function ContactSection() {
                 <span className="block h-px w-0 bg-black/80 dark:bg-white/80 transition-all duration-500 group-hover:w-full mt-2"></span>
               </a>
             </div>
+
             <div className="space-y-3 sm:space-y-4">
               <h3 className="text-xs sm:text-sm uppercase tracking-wider text-black/50 dark:text-white/50">Connect</h3>
               <div className="flex flex-wrap gap-2.5 sm:gap-3">
@@ -107,6 +180,7 @@ export default function ContactSection() {
                 ))}
               </div>
             </div>
+
             <div className="space-y-3 sm:space-y-4">
               <h3 className="text-xs sm:text-sm uppercase tracking-wider text-black/50 dark:text-white/50">Location</h3>
               <p className="text-lg sm:text-xl text-black/70 dark:text-white/70">
@@ -114,6 +188,7 @@ export default function ContactSection() {
               </p>
             </div>
           </div>
+
           <div className="space-y-4 sm:space-y-6">
             <form onSubmit={handleSubmit} className="space-y-4 sm:space-y-6">
               <div className="group">
@@ -127,10 +202,12 @@ export default function ContactSection() {
                   value={formData.name}
                   onChange={handleChange}
                   required
-                  className="w-full px-4 py-3 sm:px-6 sm:py-4 bg-black/5 dark:bg-white/5 border border-black/10 dark:border-white/10 rounded-xl sm:rounded-2xl text-black dark:text-white placeholder-black/30 dark:placeholder-white/30 focus:bg-black/10 dark:focus:bg-white/10 focus:border-black/30 dark:focus:border-white/30 focus:outline-none transition-all duration-300 text-sm sm:text-base"
+                  disabled={status === 'loading'}
+                  className="w-full px-4 py-3 sm:px-6 sm:py-4 bg-black/5 dark:bg-white/5 border border-black/10 dark:border-white/10 rounded-xl sm:rounded-2xl text-black dark:text-white placeholder-black/30 dark:placeholder-white/30 focus:bg-black/10 dark:focus:bg-white/10 focus:border-black/30 dark:focus:border-white/30 focus:outline-none transition-all duration-300 text-sm sm:text-base disabled:opacity-60 disabled:cursor-not-allowed"
                   placeholder="Your name"
                 />
               </div>
+
               <div className="group">
                 <label htmlFor="email" className="block text-xs sm:text-sm text-black/50 dark:text-white/50 mb-1.5 sm:mb-2 group-focus-within:text-black/80 dark:group-focus-within:text-white/80 transition-colors">
                   Email
@@ -142,10 +219,12 @@ export default function ContactSection() {
                   value={formData.email}
                   onChange={handleChange}
                   required
-                  className="w-full px-4 py-3 sm:px-6 sm:py-4 bg-black/5 dark:bg-white/5 border border-black/10 dark:border-white/10 rounded-xl sm:rounded-2xl text-black dark:text-white placeholder-black/30 dark:placeholder-white/30 focus:bg-black/10 dark:focus:bg-white/10 focus:border-black/30 dark:focus:border-white/30 focus:outline-none transition-all duration-300 text-sm sm:text-base"
+                  disabled={status === 'loading'}
+                  className="w-full px-4 py-3 sm:px-6 sm:py-4 bg-black/5 dark:bg-white/5 border border-black/10 dark:border-white/10 rounded-xl sm:rounded-2xl text-black dark:text-white placeholder-black/30 dark:placeholder-white/30 focus:bg-black/10 dark:focus:bg-white/10 focus:border-black/30 dark:focus:border-white/30 focus:outline-none transition-all duration-300 text-sm sm:text-base disabled:opacity-60 disabled:cursor-not-allowed"
                   placeholder="your.email@example.com"
                 />
               </div>
+
               <div className="group">
                 <label htmlFor="message" className="block text-xs sm:text-sm text-black/50 dark:text-white/50 mb-1.5 sm:mb-2 group-focus-within:text-black/80 dark:group-focus-within:text-white/80 transition-colors">
                   Message
@@ -156,30 +235,95 @@ export default function ContactSection() {
                   value={formData.message}
                   onChange={handleChange}
                   required
+                  disabled={status === 'loading'}
                   rows={5}
-                  className="w-full px-4 py-3 sm:px-6 sm:py-4 bg-black/5 dark:bg-white/5 border border-black/10 dark:border-white/10 rounded-xl sm:rounded-2xl text-black dark:text-white placeholder-black/30 dark:placeholder-white/30 focus:bg-black/10 dark:focus:bg-white/10 focus:border-black/30 dark:focus:border-white/30 focus:outline-none transition-all duration-300 resize-none text-sm sm:text-base"
+                  className="w-full px-4 py-3 sm:px-6 sm:py-4 bg-black/5 dark:bg-white/5 border border-black/10 dark:border-white/10 rounded-xl sm:rounded-2xl text-black dark:text-white placeholder-black/30 dark:placeholder-white/30 focus:bg-black/10 dark:focus:bg-white/10 focus:border-black/30 dark:focus:border-white/30 focus:outline-none transition-all duration-300 resize-none text-sm sm:text-base disabled:opacity-60 disabled:cursor-not-allowed"
                   placeholder="Tell me about your project..."
                 />
               </div>
+
+              {/* Status Alert Messages */}
+              {status === 'success' && (
+                <div
+                  className="p-4 rounded-xl sm:rounded-2xl bg-emerald-500/10 border border-emerald-500/30 text-emerald-700 dark:text-emerald-300 text-sm flex items-start justify-between gap-3 animate-fade-in is-visible"
+                  role="alert"
+                >
+                  <div className="flex items-start gap-2.5">
+                    <svg className="w-5 h-5 text-emerald-500 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                    <span>{statusMessage}</span>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => setStatus('idle')}
+                    className="text-emerald-600 dark:text-emerald-400 hover:text-emerald-800 dark:hover:text-emerald-200 transition-colors p-1"
+                    aria-label="Dismiss message"
+                  >
+                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                  </button>
+                </div>
+              )}
+
+              {status === 'error' && (
+                <div
+                  className="p-4 rounded-xl sm:rounded-2xl bg-rose-500/10 border border-rose-500/30 text-rose-700 dark:text-rose-300 text-sm flex items-start justify-between gap-3 animate-fade-in is-visible"
+                  role="alert"
+                >
+                  <div className="flex items-start gap-2.5">
+                    <svg className="w-5 h-5 text-rose-500 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                    <span>{statusMessage}</span>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => setStatus('idle')}
+                    className="text-rose-600 dark:text-rose-400 hover:text-rose-800 dark:hover:text-rose-200 transition-colors p-1"
+                    aria-label="Dismiss error"
+                  >
+                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                  </button>
+                </div>
+              )}
+
               <button
                 type="submit"
-                className="group relative w-full px-6 py-3.5 sm:px-8 sm:py-4 bg-black dark:bg-white text-white dark:text-black hover:bg-black/90 dark:hover:bg-white/90 rounded-full transition-all duration-300 overflow-hidden font-medium text-sm sm:text-base"
+                disabled={status === 'loading'}
+                className="group relative w-full px-6 py-3.5 sm:px-8 sm:py-4 bg-black dark:bg-white text-white dark:text-black hover:bg-black/90 dark:hover:bg-white/90 rounded-full transition-all duration-300 overflow-hidden font-medium text-sm sm:text-base disabled:opacity-70 disabled:cursor-not-allowed"
               >
                 <span className="relative flex items-center justify-center gap-2">
-                  Send Message
-                  <svg
-                    className="w-4 h-4 sm:w-5 sm:h-5 transition-transform duration-300 group-hover:translate-x-1"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 5l7 7m0 0l-7 7m7-7H3" />
-                  </svg>
+                  {status === 'loading' ? (
+                    <>
+                      <svg className="animate-spin -ml-1 mr-2 h-5 w-5 text-white dark:text-black" fill="none" viewBox="0 0 24 24">
+                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                      </svg>
+                      Sending Message...
+                    </>
+                  ) : (
+                    <>
+                      Send Message
+                      <svg
+                        className="w-4 h-4 sm:w-5 sm:h-5 transition-transform duration-300 group-hover:translate-x-1"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                      >
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 5l7 7m0 0l-7 7m7-7H3" />
+                      </svg>
+                    </>
+                  )}
                 </span>
               </button>
             </form>
           </div>
         </div>
+
         <div className="mt-16 sm:mt-24 pt-6 sm:pt-8 border-t border-black/10 dark:border-white/10 flex flex-col sm:flex-row justify-between items-center gap-3 text-black/40 dark:text-white/40 text-xs sm:text-sm text-center sm:text-left">
           <p>© 2026 Christian Yoga. All Rights Reserved.</p>
           <p>Designed & Built with 💜</p>

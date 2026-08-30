@@ -9,6 +9,7 @@ export default function ExperienceSection() {
 
   const experiences = [
     {
+      id: 1,
       year: "August 2026 - Present",
       role: "Junior IT Programmer",
       company: "PT Swadharma Duta Data",
@@ -17,6 +18,7 @@ export default function ExperienceSection() {
       skills: ["API Integration", "RESTful API", "Frontend Web", "Internal Testing", "Quality Assurance", "Debugging"],
     },
     {
+      id: 2,
       year: "January 2025 - Present",
       role: "Full Stack Developer",
       company: "Eiqht",
@@ -25,6 +27,7 @@ export default function ExperienceSection() {
       skills: ["Next.js", "React", "Node.js", "Tailwind CSS", "REST API", "Database Design"],
     },
     {
+      id: 3,
       year: "May - August 2025",
       role: "System Analyst Intern",
       company: "Maximus Indo Asia",
@@ -33,6 +36,7 @@ export default function ExperienceSection() {
       skills: ["System Analysis", "Process Modeling", "Database Design", "UML", "Agile"],
     },
     {
+      id: 4,
       year: "September - December 2025",
       role: "Web Developer Intern",
       company: "Nabel Sakha Group",
