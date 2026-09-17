@@ -10,7 +10,7 @@ export default function ExperienceSection() {
   const experiences = [
     {
       id: 1,
-      year: "August 2026 - Present",
+      year: "August 2024 - Present",
       role: "Junior IT Programmer",
       company: "PT Swadharma Duta Data",
       current: true,
@@ -133,7 +133,7 @@ export default function ExperienceSection() {
           className="mb-14 sm:mb-20 md:mb-24 flex flex-col md:flex-row md:items-end justify-between gap-4"
         >
           <div>
-            <motion.div 
+            <motion.div
               initial={{ opacity: 0, scale: 0.9 }}
               whileInView={{ opacity: 1, scale: 1 }}
               viewport={{ once: true }}
