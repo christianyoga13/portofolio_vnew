@@ -10,7 +10,7 @@ export default function ExperienceSection() {
   const experiences = [
     {
       id: 1,
-      year: "August 2024 - Present",
+      year: "August 2026 - Present",
       role: "Junior IT Programmer",
       company: "PT Swadharma Duta Data",
       current: true,
