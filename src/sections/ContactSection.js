@@ -1,7 +1,6 @@
 'use client';
 
 import { useState } from 'react';
-import emailjs from '@emailjs/browser';
 import { useScrollAnimation } from '@/hooks/useScrollAnimation';
 
 export default function ContactSection() {
@@ -18,18 +17,9 @@ export default function ContactSection() {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    const serviceId = process.env.NEXT_PUBLIC_EMAILJS_SERVICE_ID;
-    const templateId = process.env.NEXT_PUBLIC_EMAILJS_TEMPLATE_ID;
-    const publicKey = process.env.NEXT_PUBLIC_EMAILJS_PUBLIC_KEY;
-
-    if (!serviceId || !templateId || !publicKey) {
-      console.error(
-        'EmailJS Error: Missing environment variables. Please set NEXT_PUBLIC_EMAILJS_SERVICE_ID, NEXT_PUBLIC_EMAILJS_TEMPLATE_ID, and NEXT_PUBLIC_EMAILJS_PUBLIC_KEY in your .env.local file.'
-      );
+    if (!formData.name.trim() || !formData.email.trim() || !formData.message.trim()) {
       setStatus('error');
-      setStatusMessage(
-        'Email service is not yet configured. Please add your EmailJS keys to .env.local.'
-      );
+      setStatusMessage('Please fill in all fields before sending.');
       return;
     }
 
@@ -37,17 +27,23 @@ export default function ContactSection() {
     setStatusMessage('');
 
     try {
-      const templateParams = {
-        name: formData.name.trim(),
-        from_name: formData.name.trim(),
-        email: formData.email.trim(),
-        from_email: formData.email.trim(),
-        message: formData.message.trim(),
-        reply_to: formData.email.trim(),
-        to_name: 'Christian Yoga'
-      };
+      const response = await fetch('/api/contact', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          name: formData.name.trim(),
+          email: formData.email.trim(),
+          message: formData.message.trim()
+        })
+      });
 
-      await emailjs.send(serviceId, templateId, templateParams, publicKey);
+      const data = await response.json().catch(() => ({}));
+
+      if (!response.ok) {
+        throw new Error(data?.error || 'Failed to send message. Please try again later.');
+      }
 
       setStatus('success');
       setStatusMessage('Thank you! Your message has been sent successfully. I will get back to you soon.');
@@ -57,30 +53,11 @@ export default function ContactSection() {
         message: ''
       });
     } catch (error) {
-      console.error('EmailJS Send Error Details:', {
-        status: error?.status,
-        text: error?.text,
-        message: error?.message,
-        error
-      });
-
-      const rawErrorText = error?.text || error?.message || (typeof error === 'string' ? error : '');
-      let userFriendlyMessage = 'Failed to send message. Please try again or reach out directly via email.';
-
-      if (rawErrorText.includes('Invalid grant') || rawErrorText.includes('reconnect')) {
-        userFriendlyMessage = 'Gmail connection in EmailJS expired. Please reconnect your Gmail account in the EmailJS dashboard (Email Services > Reconnect Account).';
-      } else if (rawErrorText.includes('service') && rawErrorText.includes('not found')) {
-        userFriendlyMessage = 'Invalid EmailJS Service ID. Please check your NEXT_PUBLIC_EMAILJS_SERVICE_ID in .env.local.';
-      } else if (rawErrorText.includes('template') && rawErrorText.includes('not found')) {
-        userFriendlyMessage = 'Invalid EmailJS Template ID. Please check your NEXT_PUBLIC_EMAILJS_TEMPLATE_ID in .env.local.';
-      } else if (rawErrorText.includes('public key') || rawErrorText.includes('user') && rawErrorText.includes('not found')) {
-        userFriendlyMessage = 'Invalid EmailJS Public Key. Please check your NEXT_PUBLIC_EMAILJS_PUBLIC_KEY in .env.local.';
-      } else if (rawErrorText) {
-        userFriendlyMessage = rawErrorText;
-      }
-
+      console.error('Contact form submission error:', error);
       setStatus('error');
-      setStatusMessage(userFriendlyMessage);
+      setStatusMessage(
+        error?.message || 'Failed to send message. Please try again or reach out directly via email.'
+      );
     }
   };
 
